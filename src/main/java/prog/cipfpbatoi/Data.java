@@ -158,6 +158,7 @@ public class Data {
      * @return boolean
      */
     public boolean isFestiu() {
+        // ni idea
         return false;
     }
 
@@ -167,15 +168,8 @@ public class Data {
      * @return int dia semana
      */
     public int getNumeroSetmana() {
-        if (this.dia > 0 && this.dia < 7) {
-            return 1;
-        } else if (this.dia > 7 && this.dia < 14) {
-            return 2;
-        } else if (this.dia > 14 && this.dia < 21) {
-            return 3;
-        } else {
-            return 4;
-        }
+       // ni idea
+       return 0;
     }
 
     /**
@@ -185,8 +179,21 @@ public class Data {
      * @return boolean
      */
     public Data afegir(int numDias) {
-        return null;
+    int diaNuevo = this.dia + numDias;
+    int mesNuevo = this.mes;
+    int anyoNuevo = this.any;
+
+    while (diaNuevo > getDiesMes(mesNuevo, anyoNuevo)) {
+        diaNuevo -= getDiesMes(mesNuevo, anyoNuevo);
+        mesNuevo++;
+        if (mesNuevo > 12) {
+            mesNuevo = 1;
+            anyoNuevo++;
+        }
     }
+
+    return new Data(diaNuevo, mesNuevo, anyoNuevo);
+}
 
     /**
      * Devuelve un objeto de tipo fecha que representa una fecha restando
@@ -195,12 +202,38 @@ public class Data {
      * @return boolean
      */
     public Data restar(int numDias) {
-        return null;
+    int diaNuevo = this.dia - numDias;
+    int mesNuevo = this.mes;
+    int anyoNuevo = this.any;
+
+    while (diaNuevo <= 0) {
+        if (mesNuevo == 1) {
+            mesNuevo = 12;
+            anyoNuevo--;
+        } else {
+            mesNuevo--;
+        }
+        diaNuevo += getDiesMes(mesNuevo, anyoNuevo);
     }
 
+    return new Data(diaNuevo, mesNuevo, anyoNuevo);
+}
+
     public boolean isCorrecta() {
+    if (any <= 0) {
         return false;
     }
+
+    if (mes < 1 || mes > 12) {
+        return false;
+    }
+    
+    if (dia < 1 || dia > getDiesMes(mes, any)) {
+        return false;
+    }
+
+    return true;
+}
 
     /**
      * Retorna el mes del año en formato text (enero, febrero, marzo,...)
@@ -208,7 +241,7 @@ public class Data {
      * @return char
      */
     private String getMesEnFormatText() {
-        return null;
+        return MESOS_TEXT[mes - 1];
     }
 
     /**
@@ -217,8 +250,22 @@ public class Data {
      * @return int
      */
     private int getDiesTranscorregutsOrigen() {
-        return 0;
+    int diasTranscurridos = 0;
+    
+    for (int i = 1; i < any; i++) {
+        if (isBisiesto(i)) {
+            diasTranscurridos += 366;
+        } else {
+            diasTranscurridos += 365;
+        }
     }
+    for (int i = 1; i < mes; i++) {
+        diasTranscurridos += getDiesMes(i, any);
+    }
+    diasTranscurridos += dia - 1;
+
+    return diasTranscurridos;
+}
 
     /**
      * Devuelve el número de dias transcurridos en el anyo que representa el
@@ -227,9 +274,14 @@ public class Data {
      * @return int
      */
     private int getDiesTranscorregutsEnAny() {
-        return 0;
+    int diasTranscurridos = dia - 1;
+    
+    for (int i = 1; i < mes; i++) {
+        diasTranscurridos += getDiesMes(i, any);
     }
 
+    return diasTranscurridos;
+}
     /**
      * Indica si el año pasado como argumento es bisiesto. Un año es bisiesto si
      * es divisible por 4 pero no es divisible entre 100 o es divisible entre 4
